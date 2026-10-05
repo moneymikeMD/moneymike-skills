@@ -1,0 +1,6 @@
+{
+  "name": "moneymike-skills",
+  "description": "Personal workflow skills: PR shipping and review, Jira authoring, research files, UI bug repro on real devices, Datadog monitor and catalog hygiene.",
+  "version": "0.1.0",
+  "author": { "name": "Mike Garrett" }
+}
