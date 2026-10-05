@@ -1,38 +1,43 @@
 ---
 name: prd-to-eng-briefing
-description: "Turn a PRD or project plan into a verified engineering survey, a research file with draft ticket bodies, and a shareable engineering brief. Use when Mike links a PRD, project plan, product doc or epic and asks to survey the problem space, prepare for a refinement session, understand how a system is actually built, get up to speed before opening the code, or brief a team that has not worked in the repo. Also use when he asks to incorporate someone else's prior research into a picture of a system."
+description: "Turn a PRD or project plan into a verified engineering survey, a research file with draft ticket bodies, and a shareable engineering brief. Use when the user links a PRD, project plan, product doc or epic and asks to survey the problem space, prepare for a refinement session, understand how a system is actually built, get up to speed before opening the code, or brief a team that has not worked in the repo. Also use when they ask to incorporate someone else's prior research into a picture of a system."
 license: MIT
 ---
 
 # PRD to engineering briefing
 
-Mike runs refinement sessions from this output. He needs to walk in able to correct the
+Read `~/.claude/skill-context/prd-to-eng-briefing.md` first if it exists. It holds this
+environment's document connectors, research paths, log tables and link formats, and wins
+over anything general here.
+
+The user runs refinement sessions from this output. They need to walk in able to correct the
 PRD, not recite it. The deliverable is not a summary of the document; it is the set of
 facts the document got wrong, left out, or could not see.
 
-Two failure modes to avoid. Summarising the PRD back at him produces nothing he did not
-have. Reporting a correction before finding the true mechanism produces a confident wrong
-answer that he then has to unpick.
+Two failure modes to avoid. Summarising the PRD back at them produces nothing they did
+not have. Reporting a correction before finding the true mechanism produces a confident wrong
+answer that they then have to unpick.
 
-Work in phases. Phases 1 to 4 are yours. Phase 5 is his. Do not write the output files
+Work in phases. Phases 1 to 4 are yours. Phase 5 is theirs. Do not write the output files
 before Phase 5 closes.
 
 ## Phase 1: ingest the PRD and everything it points at
 
-The PRD is usually a Google Doc. `WebFetch` fails on authenticated Google URLs by design.
-Use `mcp__claude_ai_Glean__read_document` with the URL. If Glean is not authenticated it
-returns a message telling you to authenticate; that OAuth flow is a claude.ai connector, so
-ask Mike to run `/mcp` and select it. You cannot drive it.
+The PRD is usually a Google Doc or similar. `WebFetch` fails on authenticated URLs by
+design, so read it through the document connector the context file names. If a connector
+needs OAuth that only the user can complete, ask them to run `/mcp` and select it. You
+cannot drive it.
 
 Then do three things the PRD does not ask for:
 
 - **Follow every link inside it.** Read them in one `read_document` call, not one per URL.
-- **Search for what it does not link.** `mcp__claude_ai_Glean__search` on the subject, with
-  short discriminative keywords, no boolean logic. This routinely surfaces a second
-  independent audit by someone who cares about the subject, and prior Jira tickets that
+- **Search for what it does not link.** Use the enterprise search connector on the subject,
+  with short discriminative keywords, no boolean logic. This routinely surfaces a second
+  independent audit by someone who cares about the subject, and prior tickets that
   already scoped part of the work. Both change the shape of the project.
-- **Read the spreadsheet trackers as structured data.** Glean indexes Sheets as text and
-  loses the column structure. If the columns matter for sizing, ask Mike to export CSV.
+- **Read the spreadsheet trackers as structured data.** Search indexes usually flatten
+  sheets to text and lose the column structure. If the columns matter for sizing, ask the
+  user to export CSV.
 
 Record from the PRD, because these are what the rest of the work hangs off:
 
@@ -41,7 +46,7 @@ Record from the PRD, because these are what the rest of the work hangs off:
 | DACI (driver, approver, contributors, informed) | who settles a question, and who to route a finding to |
 | numbered project steps | the steps are usually wrong in a way that matters; you will restate them |
 | success metrics | these imply instrumentation nobody has scoped |
-| questions the PRD explicitly defers to engineering | these are exactly the questions to put to Mike in Phase 5 |
+| questions the PRD explicitly defers to engineering | these are exactly the questions to put to the user in Phase 5 |
 | any step marked out of scope for this PRD | often already half built |
 
 If the PRD is empty or a stub, say so once and ask for the content. Do not survey blind on
@@ -71,8 +76,8 @@ invisible to code search. Look for it deliberately.
 
 ## Phase 3: analyse the affected codebases
 
-Read `~/code/ARCHITECTURE.md` and `~/code/research/<repo-dir-name>-best-practices.md`
-first. Use tokensave for all code exploration: `tokensave_status` to check index freshness,
+Read the workspace architecture map and the repo's best-practices file first, if the
+context file names them. Use tokensave for all code exploration: `tokensave_status` to check index freshness,
 then `tokensave_context`, `tokensave_search`, `tokensave_callers`. Never an Explore agent.
 Query sibling repos with `graph_root` rather than adding directories.
 
@@ -99,14 +104,11 @@ Take notes on these specifically. Each one either blocks a PRD step or shrinks i
 Never accept a scale claim, from the PRD or from yourself, without measuring it. A PRD that
 says "at scale" has no number behind it.
 
-- **Fastly access logs** in BigQuery answer who consumes what, how much, and with what
-  status. The www table is
-  `atlantic-switchboard.www_fastly_logs.access_logs_prd_*`, daily sharded. Always constrain
-  `_TABLE_SUFFIX`. `bq query --dry_run` first and report the bytes. Every field is a string:
-  `response.status_code` compares as a string, `response.bytes_written` needs
-  `SAFE_CAST(... AS INT64)`.
-- **Datadog cannot answer cache questions.** Hits are not shipped there, so any hit rate
-  from APM counts only misses.
+- **CDN access logs**, if they are exported to a warehouse, answer who consumes what, how
+  much, and with what status. Dry-run the query first and report the bytes; constrain any
+  date-sharded table to the range you need.
+- **Check what your APM actually receives** before computing a rate from it. If the CDN
+  answers cache hits without reaching the origin, APM sees only misses.
 - **Application database** for configuration rows. There is usually no local copy and no
   network path from the laptop; run a management command in the environment instead. Check
   the repo's best-practices file for the exact invocation.
@@ -140,22 +142,22 @@ right with the conclusion wrong, stale, or answered. Their wrong conclusions are
 much as their right ones, because someone on the team will otherwise act on them. Say
 explicitly what not to build.
 
-## Phase 5: put the decisions to Mike
+## Phase 5: put the decisions to the user
 
-Facts are yours to find. Decisions are his. Do not write the output files until he has
-answered.
+Facts are yours to find. Decisions are theirs. Do not write the output files until they
+have answered.
 
 Ask the whole answerable frontier in one round. Number each question, give a recommended
 answer with the rejected alternative and why. Questions whose answer depends on another
 open question belong in a later round. Lead with the questions the PRD explicitly deferred
-to engineering, since those are already his to settle.
+to engineering, since those are already theirs to settle.
 
-He may say no tickets. Honour that. The survey is often for his own authority in a
+They may say no tickets. Honour that. The survey is often for their own authority in a
 refinement session, not for filing work.
 
 ## Phase 6: the two files
 
-Both go in `~/code/research/`. Slug them off the project, not the PRD title:
+Both go in the research directory. Slug them off the project, not the PRD title:
 `<slug>-research.md` and `<slug>-engineering-brief.md`.
 
 ### `<slug>-research.md`
@@ -224,14 +226,14 @@ Make every reference clickable:
 
 | reference | target |
 |---|---|
-| code path with a line number | `https://github.com/theatlantic/<repo>/blob/<default-branch>/<path>#L<n>` |
+| code path with a line number | `https://github.com/<owner>/<repo>/blob/<default-branch>/<path>#L<n>` |
 | commit, pull request | `/commit/<sha>`, `/pull/<n>` |
-| Jira key | `https://svalbard.atlassian.net/browse/<KEY>` |
-| Confluence page | resolve the real URL from the Glean search result, do not guess |
+| ticket key | `https://<jira-site>/browse/<KEY>` |
+| Confluence page | resolve the real URL from the search result, do not guess |
 | Django admin page | the live admin URL, checking where the urlconf mounts admin |
 | Google Doc or Sheet | the URL from the PRD, first mention only |
 | BigQuery table | the project's BigQuery console, first mention only |
-| Slack channel | `https://grid-svalbard.enterprise.slack.com/archives/<CHANNEL_ID>` |
+| Slack channel | `https://<workspace>.slack.com/archives/<CHANNEL_ID>` |
 | live endpoint | link it where clicking is the verification, such as a defects table. Not on every mention. |
 
 Confirm the repo and default branch from `git remote get-url origin` rather than assuming;
@@ -253,9 +255,8 @@ expected to outlive the branch.
 ### Publishing to Confluence
 
 Pasting markdown into the Confluence editor silently strips every link. Publish through the
-API instead, and note which Atlassian site the space is on: `INTER` and the Jira projects
-are on svalbard, but the wiki spaces are on `atlanticmedia.atlassian.net`, so the space and
-the tickets you link are usually on **different connectors**.
+API instead, and note which Atlassian site the space is on. The wiki and the tickets you
+link can sit on **different sites and connectors**.
 
 **Use `contentFormat: "html"`, never `"markdown"`.** ADF cannot carry a `code` mark and a
 `link` mark on the same text node, and the two converters resolve that conflict in opposite
