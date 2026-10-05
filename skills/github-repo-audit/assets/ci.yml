@@ -1,0 +1,21 @@
+# VERSIONS BELOW ARE PLACEHOLDERS. Resolve each one before use:
+#   gh api repos/OWNER/ACTION/releases/latest --jq .tag_name
+# @vLATEST is invalid on purpose - it fails the run rather than
+# silently shipping a pin that was current when this file was written.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@vLATEST
+      - uses: actions/setup-node@vLATEST
+        with:
+          node-version: lts/*
+      - run: npm ci
+      - run: npm test

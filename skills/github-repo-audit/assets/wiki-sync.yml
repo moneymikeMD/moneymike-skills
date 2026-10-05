@@ -1,0 +1,34 @@
+# VERSIONS BELOW ARE PLACEHOLDERS. Resolve each one before use:
+#   gh api repos/OWNER/ACTION/releases/latest --jq .tag_name
+# @vLATEST is invalid on purpose - it fails the run rather than
+# silently shipping a pin that was current when this file was written.
+name: Wiki sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@vLATEST
+      - uses: actions/checkout@vLATEST
+        with:
+          repository: ${{ github.repository }}.wiki
+          path: wiki
+      - run: |
+          rm -f wiki/*.md
+          cp docs/*.md wiki/ 2>/dev/null || true
+          find docs -mindepth 2 -name '*.md' -print0 | while IFS= read -r -d '' f; do
+            slug=$(echo "$f" | sed 's#^docs/##; s#/#-#g')
+            cp "$f" "wiki/$slug"
+          done
+          cd wiki
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet || git commit -m "sync docs/ from ${{ github.sha }}"
+          git push

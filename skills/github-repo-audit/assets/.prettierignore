@@ -1,0 +1,11 @@
+# Prettier's default glob (`.`) touches everything under the repo. Scope it
+# to the source code this project actually wants formatted, and exclude
+# files owned by other tools that rewrite them in their own style:
+# release-please's own outputs (fighting them fails CI on every release),
+# and generic project conventions (workflow YAML, docs, README, fixtures)
+# that shouldn't be silently reformatted alongside a printWidth change.
+CHANGELOG.md
+.release-please-manifest.json
+.github/
+docs/
+README.md

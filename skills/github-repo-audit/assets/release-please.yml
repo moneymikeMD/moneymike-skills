@@ -1,0 +1,21 @@
+# VERSIONS BELOW ARE PLACEHOLDERS. Resolve each one before use:
+#   gh api repos/OWNER/ACTION/releases/latest --jq .tag_name
+# @vLATEST is invalid on purpose - it fails the run rather than
+# silently shipping a pin that was current when this file was written.
+name: release-please
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@vLATEST
+        with:
+          release-type: node
