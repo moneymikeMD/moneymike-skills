@@ -1,12 +1,14 @@
 ---
 name: android-device-test
-description: "Reproduce and A/B a web UI bug on Mike's physical Android phone over adb + Chrome DevTools Protocol, including simulating the Atlantic app's WebView keyboard behaviour. Use when asked to 'test this on my Android device', reproduce an Android-only layout/keyboard/viewport bug, or confirm a fix on real hardware."
+description: "Reproduce and A/B a web UI bug on the user's physical Android phone over adb + Chrome DevTools Protocol, including simulating a native app WebView's keyboard behaviour. Use when asked to 'test this on my Android device', reproduce an Android-only layout/keyboard/viewport bug, or confirm a fix on real hardware."
 license: MIT
 ---
 
 # Test this on my Android device
 
-Mike keeps a physical Android phone plugged in. **Reproduce on it rather than reasoning from source** — that is a standing preference, not a nicety. A verified before/after on hardware beats any amount of CSS reading.
+Read `~/.claude/skill-context/android-device-test.md` first if it exists. It holds this machine's device, Appium paths, the native app being simulated and the host site, and wins over anything general here.
+
+The user keeps a physical Android phone plugged in. **Reproduce on it rather than reasoning from source** — that is a standing preference, not a nicety. A verified before/after on hardware beats any amount of CSS reading.
 
 ## Before anything else: recall
 
@@ -21,16 +23,14 @@ Prior sessions hold device specs, setup traps, and gesture recipes. Read them be
 | Situation | Tool |
 |---|---|
 | Layout, viewport, keyboard, scrolling, JS state, screenshots, A/B of CSS | **CDP** (this skill's `scripts/cdp.mjs`) — fastest, no server to boot |
-| Native gestures (pinch zoom), driving the OS outside the page | **Appium** — `~/code/project_tools/device_automation/android/start.sh`, port 4725 |
+| Native gestures (pinch zoom), driving the OS outside the page | **Appium**, with the start script and port from the context file |
 | IME bugs: composing underlines, autocorrect mutating input, suggestion strips | **Neither.** Structurally unreproducible — every automation path injects text and never opens a composition. Hand the phone to a human and ask which *keyboard* they use (SwiftKey vs Gboard vs Samsung); that matters more than the browser. |
 
 Default to CDP. Reach for Appium only when the page alone cannot express the interaction.
 
 ## The device
 
-Sony Xperia 10 VI, model `XQ-EC72`, serial `QV770LB2MM`, Android 16 (API 36).
-1080x2340 @ 400dpi → **devicePixelRatio 2.5, layout viewport 432x808 CSS px.**
-Chrome 151, system WebView 150.
+The context file gives the model, serial, devicePixelRatio and CSS viewport. If it does not, read them off the device (`adb shell getprop ro.product.model`, then `./cdp.mjs eval` for `innerWidth`, `innerHeight` and `devicePixelRatio`) and record them there.
 
 CDP coordinates are **CSS pixels**. Appium W3C actions are **device pixels**. Do not mix them up.
 
@@ -46,7 +46,7 @@ adb forward tcp:9333 localabstract:chrome_devtools_remote
 Then drive it. `--match` picks the page by URL substring; `CDP_MATCH` sets it for a whole session.
 
 ```bash
-cd ~/.claude/skills/android-device-test/scripts
+cd <this skill's base directory>/scripts
 export CDP_MATCH=localhost:3003
 
 ./cdp.mjs targets                              # list debuggable pages
@@ -58,12 +58,12 @@ export CDP_MATCH=localhost:3003
 
 `cdp.mjs` needs no `npm install` — it uses Node's global `WebSocket` (Node >= 21), so it runs from any cwd.
 
-## Simulating the Atlantic app's WebView
+## Simulating a native app's WebView
 
-**This is the part that makes Android-only keyboard bugs reproducible.** The native app's WebView is not debuggable (no `chrome_devtools_remote` socket for `com.theatlantic.newsstand`), so use Chrome — but Chrome alone will *not* reproduce keyboard bugs, and that difference is easy to mistake for "cannot reproduce".
+**This is the part that makes Android-only keyboard bugs reproducible.** A release build's WebView is usually not debuggable (no `chrome_devtools_remote` socket for the app's package), so use Chrome — but Chrome alone will *not* reproduce keyboard bugs, and that difference is easy to mistake for "cannot reproduce".
 
 - **Chrome on Android** defaults to `interactive-widget=resizes-visual`: the keyboard shrinks only the *visual* viewport and Chrome pans it. `100svh`, flex layout, and media queries never see a change.
-- **The app's WebView** uses `adjustResize`, equivalent to `interactive-widget=resizes-content`: the *layout* viewport shrinks, so `100svh` shrinks and the whole page re-lays out.
+- **An app WebView** with `adjustResize` (check the context file for the app being simulated) behaves like to `interactive-widget=resizes-content`: the *layout* viewport shrinks, so `100svh` shrinks and the whole page re-lays out.
 
 Switch Chrome into the app's mode before testing anything keyboard-related:
 
@@ -95,7 +95,7 @@ Measure hard numbers, not vibes. For a keyboard/clipping bug the useful ones are
 
 ## Check the iframe embed too
 
-The games are embedded on theatlantic.com by iframe, so a scroll fix that behaves in the standalone page can still wreck the host article. Stand up a throwaway host to check:
+If the page is embedded in a host site by iframe, a scroll fix that behaves in the standalone page can still wreck the host article. Stand up a throwaway host to check:
 
 ```html
 <!-- /tmp/iframe-host.html, served next to the page under test -->
@@ -119,10 +119,10 @@ Scroll the parent, run the behaviour inside the frame, and assert the parent's `
 - Leave 3-4s after a tap before measuring: the keyboard animates, and `visualViewport` resize fires several times on the way up.
 
 **From earlier sessions (memorygraph):**
-- `adb devices` showing `unauthorized` means the RSA prompt is unanswered. Only Mike can tap "Allow" / "Always allow from this computer" on the phone — there is nothing to debug on the host.
-- Appium only: PATH must lead with `/Users/mgarrett/.nvm/versions/node/v24.18.0/bin` (a plain shell resolves Node 18 and Appium dies with a misleading `lru-cache` stack trace).
+- `adb devices` showing `unauthorized` means the RSA prompt is unanswered. Only the user can tap "Allow" / "Always allow from this computer" on the phone — there is nothing to debug on the host.
+- Appium only: run it under the Node version the context file names. An old Node makes Appium die with a misleading `lru-cache` stack trace.
 - Appium only: the insecure feature flag must be namespaced — `--allow-insecure="uiautomator2:chromedriver_autodownload"`.
-- Appium only: `appium driver doctor uiautomator2` reporting a missing `emulator` binary is a false alarm for real-device work; there is no full Android SDK on this machine and none is needed.
+- Appium only: `appium driver doctor uiautomator2` reporting a missing `emulator` binary is a false alarm for real-device work; a full Android SDK is not needed.
 - Appium contexts here are `NATIVE_APP` and `CHROMIUM` — not the `WEBVIEW_*` names iOS uses.
 
 ## Teardown
@@ -130,7 +130,7 @@ Scroll the parent, run the behaviour inside the frame, and assert the parent's `
 ```bash
 adb reverse --remove tcp:3003
 adb forward --remove tcp:9333
-# Appium only: DELETE the session, then pkill -f 'appium server --port 4725'
+# Appium only: DELETE the session, then pkill -f 'appium server --port <port>'
 ```
 
 Leave the repo clean. Viewport-meta and injected-stylesheet changes are runtime-only and vanish on reload — confirm with `git status` that nothing leaked into the working tree.
