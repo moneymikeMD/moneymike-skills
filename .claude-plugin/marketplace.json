@@ -1,0 +1,12 @@
+{
+  "name": "moneymike-skills",
+  "description": "Private staging marketplace for moneymike-skills. Delete this file when the plugin is listed in moneymike-plugins.",
+  "owner": { "name": "Mike Garrett" },
+  "plugins": [
+    {
+      "name": "moneymike-skills",
+      "description": "Personal workflow skills: PR shipping and review, Jira authoring, research files, UI bug repro on real devices, Datadog monitor and catalog hygiene.",
+      "source": "./"
+    }
+  ]
+}
