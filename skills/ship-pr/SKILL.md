@@ -22,10 +22,10 @@ Must already be `<prefix>/<KEY or type>/<slug>` off the repo default branch. If 
 
 ## Commit
 
-Subject: conventional-commit type, imperative, ticket key at the END.
+Subject: conventional-commit type, imperative. The ticket key lives in the branch name only, never in the subject.
 
 ```
-fix: Disable autocorrect on the answer input ABC-1737
+fix: Disable autocorrect on the answer input
 ```
 
 Body: at most one or two sentences, often none. No co-author trailer. Reasoning that does not fit goes in the ticket, not the commit.
