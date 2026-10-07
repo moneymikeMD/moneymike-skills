@@ -4,11 +4,9 @@ Personal workflow skills for Claude Code, written to be environment-neutral. Eac
 
 Two shared context files are optional. `memory.md` tells the skills how to recall and store memories; without it they skip those steps and say what was not stored. `research.md` names the directory for per-product research files; without it they skip research appends, and `research-file-update` stops. Samples are in `examples/`.
 
-Private while it goes through verification. Install with:
+Published through [moneymikeMD/moneymike-plugins](https://github.com/moneymikeMD/moneymike-plugins). Install with:
 
 ```sh
-claude plugin marketplace add moneymikeMD/moneymike-skills
-claude plugin install moneymike-skills@moneymike-skills
+claude plugin marketplace add moneymikeMD/moneymike-plugins
+claude plugin install moneymike-skills@moneymike-plugins
 ```
-
-Going public: delete `.claude-plugin/marketplace.json` and add an entry to `moneymikeMD/moneymike-plugins`.
