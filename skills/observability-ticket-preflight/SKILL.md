@@ -8,13 +8,13 @@ license: MIT
 
 Read `~/.claude/skill-context/observability-ticket-preflight.md` first if it exists. It holds this environment's intent and research files and its fleet constraints, and wins over anything general here.
 
+Also read `memory.md` and `research.md` from that directory if they exist: they say how this environment recalls and stores memories and where its research files live. With no memory store set up anywhere, skip the recall and store steps below and tell the user what was not stored; with no research directory, do the same for research-file appends.
+
 A ticket once got cancelled after a branch was cut: the outcome it asked for was already true in prod through a mechanism outside the repo. The epic's audit data was stale. Ten minutes against live Datadog would have saved the ticket.
 
 ## 1. Recall and read the intent file
 
-```bash
-memorygraph recall --query "<service> datadog <topic>" --limit 10
-```
+Recall from the memory store before anything else (how: `memory.md`): query `<service> datadog <topic>`, limit 10.
 
 The intent file holds ticket status and settled decisions (cancelled tickets not to re-propose, criteria traded away, reverts held for another team). The best-practices file holds the product rules. Read both before proposing anything.
 
@@ -55,4 +55,4 @@ When a repo or resource that should exist is invisible to search, suspect permis
 
 ## 6. Only then plan the change
 
-Branch, config, PR via `ship-pr`. Monitor edits via `dd-monitor-change`. Entity files via `dd-catalog-entity`. Store the verification result in memorygraph either way; a cancelled ticket with evidence is a result.
+Branch, config, PR via `ship-pr`. Monitor edits via `dd-monitor-change`. Entity files via `dd-catalog-entity`. Store the verification result as a `solution` memory either way; a cancelled ticket with evidence is a result.

@@ -8,13 +8,13 @@ license: MIT
 
 Read `~/.claude/skill-context/ship-pr.md` first if it exists. It holds this environment's branch prefix, default branches, local hosts and gh quirks, and wins over anything general here.
 
+Also read `memory.md` and `research.md` from that directory if they exist: they say how this environment recalls and stores memories and where its research files live. With no memory store set up anywhere, skip the recall and store steps below and tell the user what was not stored; with no research directory, do the same for research-file appends.
+
 The user has hand-cut PR bodies, commit bodies and ticket comments repeatedly. Every limit here was set after one of those cuts. The failure mode is the same each time: the artifact becomes a diary of how the work went instead of the one thing a reviewer needs.
 
 ## Recall first
 
-```bash
-memorygraph recall --query "pull request <repo>" --limit 10
-```
+Recall from the memory store before anything else (how: `memory.md`): query `pull request <repo>`, limit 10.
 
 ## Branch
 
@@ -56,7 +56,7 @@ Shape, in this order and nothing more:
 5. The GIF, or the no-GIF line (below).
 6. The ticket link.
 
-Nothing else survives: no headings, no checklists, no test plan, no file walkthrough, no verification receipts, no "also noticed", no offers of further work. Anything that took real digging goes in memorygraph or the research files. Title stays conventional-commit with no ticket key; repos often enforce that in CI.
+Nothing else survives: no headings, no checklists, no test plan, no file walkthrough, no verification receipts, no "also noticed", no offers of further work. Anything that took real digging goes in the memory store or the research files. Title stays conventional-commit with no ticket key; repos often enforce that in CI.
 
 If editing an existing PR body, read it first with `gh pr view N --json body`. The user often rewrites it themselves, and bots may append blocks (a preview-deployment block, for one) that must survive a replace.
 
@@ -87,6 +87,4 @@ A clean CodeRabbit pass creates no review object. Check the walkthrough comment'
 
 ## Memory
 
-```bash
-memorygraph store --type solution --title "<repo> PR #N: <what>" --content "<decisions>" --tags "<repo>,pull-request,<component>"
-```
+Store a `solution` titled `<repo> PR #N: <what>`, content `<decisions>`, tags `<repo>,pull-request,<component>`.

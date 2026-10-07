@@ -8,13 +8,13 @@ license: MIT
 
 Read `~/.claude/skill-context/android-device-test.md` first if it exists. It holds this machine's device, Appium paths, the native app being simulated and the host site, and wins over anything general here.
 
+Also read `memory.md` from that directory if it exists: it says how this environment recalls and stores memories. With no memory store set up anywhere, skip the recall and store steps below and tell the user what was not stored.
+
 The user keeps a physical Android phone plugged in. **Reproduce on it rather than reasoning from source** — that is a standing preference, not a nicety. A verified before/after on hardware beats any amount of CSS reading.
 
 ## Before anything else: recall
 
-```bash
-memorygraph recall --query "android device <topic>" --limit 10
-```
+Recall from the memory store before anything else (how: `memory.md`): query `android device <topic>`, limit 10.
 
 Prior sessions hold device specs, setup traps, and gesture recipes. Read them before you start; store what you learn when you finish (see Memory at the bottom).
 
@@ -118,7 +118,7 @@ Scroll the parent, run the behaviour inside the frame, and assert the parent's `
 - A screenshot spans the full layout viewport; under `resizes-content` the keyboard area renders blank/white. That is expected, not a broken capture.
 - Leave 3-4s after a tap before measuring: the keyboard animates, and `visualViewport` resize fires several times on the way up.
 
-**From earlier sessions (memorygraph):**
+**From earlier sessions:**
 - `adb devices` showing `unauthorized` means the RSA prompt is unanswered. Only the user can tap "Allow" / "Always allow from this computer" on the phone — there is nothing to debug on the host.
 - Appium only: run it under the Node version the context file names. An old Node makes Appium die with a misleading `lru-cache` stack trace.
 - Appium only: the insecure feature flag must be namespaced — `--allow-insecure="uiautomator2:chromedriver_autodownload"`.
@@ -143,10 +143,4 @@ Give a table of the measured numbers before and after, state which viewport mode
 
 Store what a future session would otherwise rediscover:
 
-```bash
-memorygraph store --type solution --title "<what was confirmed on device>" \
-  --content "<A/B numbers, viewport mode, device, verdict>" \
-  --tags "android, device-testing, <repo>, <ticket>"
-```
-
-Store setup traps as `--type error`, reusable recipes as `--type code_pattern`.
+Store a `solution` titled `<what was confirmed on device>`, content `<A/B numbers, viewport mode, device, verdict>`, tags `android,device-testing,<repo>,<ticket>`. Store setup traps as `error`, reusable recipes as `code_pattern`.
