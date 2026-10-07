@@ -8,7 +8,10 @@ license: MIT
 
 Read `~/.claude/skill-context/prd-to-eng-briefing.md` first if it exists. It holds this
 environment's document connectors, research paths, log tables and link formats, and wins
-over anything general here.
+over anything general here. Also read `memory.md` and `research.md` from that directory if
+they exist: they say how this environment stores memories and where its research directory
+is. With no memory store set up anywhere, skip the store steps and tell the user what was
+not stored. With no research directory, ask the user where the two files should go.
 
 The user runs refinement sessions from this output. They need to walk in able to correct the
 PRD, not recite it. The deliverable is not a summary of the document; it is the set of
@@ -288,7 +291,7 @@ boundary. Harmless, but rewrite those sentences if the page needs to look polish
 
 ## Close the loop
 
-Store as you go, not at the end. One memory per distinct finding, so each can be recalled
+Store to the memory store (how: `memory.md`) as you go, not at the end. One memory per distinct finding, so each can be recalled
 alone:
 
 - the runtime mechanism the PRD could not see, tagged as a gotcha
@@ -297,6 +300,4 @@ alone:
 - the access topology, which costs the most time to re-derive
 - the adjudication of any prior research, including what not to build
 
-Then one `workflow` memory naming the files written and what is still outstanding. Backticks
-inside a double-quoted `--content` run as command substitution; assign via a quoted heredoc
-and pass `"$VAR"`.
+Then one `workflow` memory naming the files written and what is still outstanding.

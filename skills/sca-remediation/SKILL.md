@@ -8,13 +8,13 @@ license: MIT
 
 Read `~/.claude/skill-context/sca-remediation.md` first if it exists. It names the repos in scope, the findings source this environment actually uses, and the cost constraints, and wins over anything general here.
 
+Also read `memory.md` and `research.md` from that directory if they exist: they say how this environment recalls and stores memories and where its research files live. With no memory store set up anywhere, skip the recall and store steps below and tell the user what was not stored; with no research directory, do the same for research-file appends.
+
 One backlog audit found that 90% of the findings were stale lockfiles, not upgrade work, and two repos needed zero manifest edits. Start from that assumption and prove otherwise per finding.
 
 ## Recall
 
-```bash
-memorygraph recall --query "sca <repo> dependencies" --limit 10
-```
+Recall from the memory store before anything else (how: `memory.md`): query `sca <repo> dependencies`, limit 10.
 
 ## 0. Confirm the read path is live
 
@@ -61,4 +61,4 @@ Only production-scope findings are exposure. A shared library whose findings are
 
 ## 7. Deliver
 
-One branch per repo, one commit, via `ship-pr`. No merge offers. Store the baseline and per-repo results in memorygraph and append product behaviour to the research file.
+One branch per repo, one commit, via `ship-pr`. No merge offers. Store the baseline and per-repo results as `solution` memories and append product behaviour to the research file.

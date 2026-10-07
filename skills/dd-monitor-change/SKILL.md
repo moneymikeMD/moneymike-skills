@@ -8,13 +8,13 @@ license: MIT
 
 Read `~/.claude/skill-context/dd-monitor-change.md` first if it exists. It holds this org's routing handles, team tag, dashboards and research files, and wins over anything general here.
 
+Also read `memory.md` and `research.md` from that directory if they exist: they say how this environment recalls and stores memories and where its research files live. With no memory store set up anywhere, skip the recall and store steps below and tell the user what was not stored; with no research directory, do the same for research-file appends.
+
 Every rule here was paid for on a real batch of production monitors. Read the research files the context file names before starting.
 
 ## Recall
 
-```bash
-memorygraph recall --query "datadog monitor <id or name>" --limit 10
-```
+Recall from the memory store before anything else (how: `memory.md`): query `datadog monitor <id or name>`, limit 10.
 
 ## 1. Save before-state
 

@@ -8,15 +8,15 @@ license: MIT
 
 Read `~/.claude/skill-context/ui-bug-repro.md` first if it exists. It holds this environment's local hosts, device, Appium scripts, app bundle ids, deep-link routes and accessibility locators, and wins over anything general here.
 
+Also read `memory.md` from that directory if it exists: it says how this environment recalls and stores memories. With no memory store set up anywhere, skip the recall and store steps below and tell the user what was not stored.
+
 Standing preference: reproduce, then reason. One bug could not be reproduced in desktop Chrome and static analysis produced a plausible unproven hypothesis. The iPhone crashed in two pinch cycles and an on-device A/B isolated one CSS line.
 
 The simulator is not a device. In one investigation WebView localStorage survived force-quit across three simulator configurations, including a brand-new container and an instant-kill stress test. The same steps on the physical iPhone lost the data on the first try. For any "it works while the app is open, it is gone after I close it" report, **go to the device before reporting a negative**. A clean simulator result is evidence about the simulator only, and saying otherwise is the mistake to avoid.
 
 ## Recall
 
-```bash
-memorygraph recall --query "<component> <symptom>" --limit 10
-```
+Recall from the memory store before anything else (how: `memory.md`): query `<component> <symptom>`, limit 10.
 
 ## Preflight: pass these gates before reproducing anything
 
@@ -131,8 +131,4 @@ Before naming a line of code as the cause, confirm it is absent from the control
 
 ## Deliver
 
-Confirmed root cause with the A/B evidence, then the fix via `ship-pr` with a GIF or the no-GIF line. Store the repro recipe and root cause:
-
-```bash
-memorygraph store --type fix --title "<ticket> root cause: <one line>" --content "<repro, A/B, fix>" --tags "<component>,<ticket>,ios,ui-testing"
-```
+Confirmed root cause with the A/B evidence, then the fix via `ship-pr` with a GIF or the no-GIF line. Store the repro recipe and root cause as a `fix` titled `<ticket> root cause: <one line>`, content `<repro, A/B, fix>`, tags `<component>,<ticket>,ios,ui-testing`.

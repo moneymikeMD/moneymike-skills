@@ -8,6 +8,8 @@ license: MIT
 
 Read `~/.claude/skill-context/jira-author.md` first if it exists. It holds this environment's Jira site, project, issue types, persona and transition ids, and wins over anything general here.
 
+Also read `memory.md` and `research.md` from that directory if they exist: they say how this environment recalls and stores memories and where its research files live. With no memory store set up anywhere, skip the recall and store steps below and tell the user what was not stored; with no research directory, do the same for research-file appends.
+
 The user has cut descriptions down by hand repeatedly. Treat the limits here as settled constraints, not style preferences. The failure mode is always the same: the ticket becomes a running commentary on how the work went instead of an artifact two other people can use.
 
 **A ticket is a vehicle for two readers.** A developer works the feature from it, and a reviewer checks the important points were hit. Neither needs your reasoning trail.
@@ -75,7 +77,7 @@ The bullets and label cost roughly 60 characters. They come out of the bug's 125
 
 ### Do not treat the ticket as a lab notebook
 
-Resist re-editing the description each time you learn something. If you are adding a third `DECIDED:` or `KNOWN RISK:` note, you are writing to yourself. Put it in memorygraph or a research file instead.
+Resist re-editing the description each time you learn something. If you are adding a third `DECIDED:` or `KNOWN RISK:` note, you are writing to yourself. Put it in the memory store or a research file instead.
 
 ## Code identifiers get backticks
 
@@ -120,7 +122,7 @@ A ticket is a manager handing a scoped item to their team, so the register is pe
 
 Mechanisms, gotchas, corrected assumptions, evidence and per-item results belong in:
 
-- `memorygraph store`, per the store and link triggers in CLAUDE.md
+- the memory store (see `memory.md`)
 - the research files, one per product. Append a dated section, never overwrite an existing finding (see `research-file-update`).
 
 When the detail is already in both places, writing it into the ticket too is pure duplication.
@@ -145,7 +147,7 @@ Branch naming, push and PR rules live in CLAUDE.md and are not this skill's job.
 - [ ] A proposed fix reads as an option rather than an instruction, and opens with `Potential fix: `
 - [ ] No line addressed to the user, and no `land`, `lands` or `nobody`
 - [ ] No progress log, no tables, no CI status, no out-of-scope section, and on a Story or Task no evidence either
-- [ ] Anything cut has a home in memorygraph or a research file
+- [ ] Anything cut has a home in the memory store or a research file
 - [ ] Correct site and project, and issue type verified against project metadata
 
 ## Transitions and connection gotchas
@@ -154,4 +156,4 @@ Look up transition ids with `getTransitionsForJiraIssue` rather than guessing, u
 
 The Atlassian MCP can return an AWS WAF human-verification HTML page instead of JSON. That is not a permissions problem and not evidence the ticket is missing; retry once, then tell the user the site is challenging the connector.
 
-Draft comments at full reasoning depth (decisions, exemptions, constraints) and let the user cut. They prefer over-supply they can trim to under-supply they have to ask for. What never survives their cut: improvements beyond the ACs, notes that the ticket text is stale, product gotchas, incidental fixes. Those go to memorygraph and the research files before posting.
+Draft comments at full reasoning depth (decisions, exemptions, constraints) and let the user cut. They prefer over-supply they can trim to under-supply they have to ask for. What never survives their cut: improvements beyond the ACs, notes that the ticket text is stale, product gotchas, incidental fixes. Those go to the memory store and the research files before posting.

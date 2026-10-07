@@ -8,6 +8,8 @@ license: MIT
 
 Read `~/.claude/skill-context/review-teammate-pr.md` first if it exists. It names the issue tracker and how to reach it, and wins over anything general here.
 
+Also read `memory.md` from that directory if it exists: it says how this environment recalls and stores memories. With no memory store set up anywhere, skip the recall and store steps below and tell the user what was not stored.
+
 The user is the one who talks to the author. This skill produces text they read first and paste second, so it has to be short enough to paste and correct enough to defend.
 
 ## Rules that do not bend
@@ -52,6 +54,4 @@ If the diff is clean, the whole answer is one line saying so.
 
 Store any recurring false positive or repo-specific trap:
 
-```bash
-memorygraph store --type code_pattern --title "<repo>: <pattern>" --content "<what and why>" --tags "<repo>,code-review,<component>"
-```
+Store a `code_pattern` titled `<repo>: <pattern>`, content `<what and why>`, tags `<repo>,code-review,<component>`.

@@ -8,11 +8,11 @@ license: MIT
 
 Read `~/.claude/skill-context/dd-catalog-entity.md` first if it exists. It holds this org's team handle, custom kinds, naming rules, GitHub org and deliberate exceptions, and wins over anything general here.
 
+Also read `memory.md` and `research.md` from that directory if they exist: they say how this environment recalls and stores memories and where its research files live. With no memory store set up anywhere, skip the recall and store steps below and tell the user what was not stored; with no research directory, do the same for research-file appends.
+
 ## Recall
 
-```bash
-memorygraph recall --query "datadog catalog <repo or entity>" --limit 10
-```
+Recall from the memory store before anything else (how: `memory.md`): query `datadog catalog <repo or entity>`, limit 10.
 
 ## Facts that decide the file
 

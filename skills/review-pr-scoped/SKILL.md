@@ -8,12 +8,14 @@ license: MIT
 
 Read `~/.claude/skill-context/review-pr-scoped.md` first if it exists. It holds this environment's known false positives and wins over anything general here.
 
+Also read `memory.md` from that directory if it exists: it says how this environment recalls and stores memories. With no memory store set up anywhere, skip the recall and store steps below and tell the user what was not stored.
+
 The user once dropped a correct finding because it recommended deleting a dead function inside a PR whose intent was a mechanical helper swap. The finding was right and still unwelcome: deleting code is a larger blast radius than the PR meant to take on. Severity alone is the wrong sort key.
 
 ## Before reading the diff
 
 1. State the PR's intent in one sentence, from its title, body and linked ticket. If the PR is a mechanical change (dependency bump, helper swap, rename, config), say so; that narrows what counts as blocking.
-2. `memorygraph recall --query "<repo> code review" --limit 10`. Some false positives recur, and a reviewer repeating one does not make it right.
+2. Recall from the memory store (how: `memory.md`): query `<repo> code review`, limit 10. Some false positives recur, and a reviewer repeating one does not make it right.
 
 ## Run the review
 
@@ -37,6 +39,4 @@ A finding that says "this will break X" gets checked against X (the live monitor
 
 Store any finding pattern that could recur:
 
-```bash
-memorygraph store --type code_pattern --title "<repo>: <pattern>" --content "<what and why>" --tags "<repo>,code-review,<component>"
-```
+Store a `code_pattern` titled `<repo>: <pattern>`, content `<what and why>`, tags `<repo>,code-review,<component>`.
