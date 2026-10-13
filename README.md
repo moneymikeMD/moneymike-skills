@@ -10,3 +10,8 @@ Published through [moneymikeMD/moneymike-plugins](https://github.com/moneymikeMD
 claude plugin marketplace add moneymikeMD/moneymike-plugins
 claude plugin install moneymike-skills@moneymike-plugins
 ```
+
+## A second plugin in this repo
+
+[`plugins/bash-lsp/`](plugins/bash-lsp/README.md) is a separate plugin, `bash-lsp@moneymike-plugins`: the bash language server for Claude Code. It has its own `plugin.json` and version, and installing
+`moneymike-skills` does not install it.

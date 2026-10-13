@@ -1,0 +1,6 @@
+{
+  "name": "bash-lsp",
+  "description": "Bash language server for Claude Code: shellcheck diagnostics after each edit of a shell script, plus go-to-definition and document symbols through the LSP tool.",
+  "version": "0.1.0",
+  "author": { "name": "Mike Garrett" }
+}
