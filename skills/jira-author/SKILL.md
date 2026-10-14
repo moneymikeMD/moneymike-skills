@@ -20,7 +20,7 @@ Use the Atlassian connection and project the context file names. Check `getJiraP
 
 ## Description format
 
-Hard limit: **1000 characters for the whole description**, and **1250 on a `Bug`**, because a bug also has to carry its verification. Count it before posting:
+Hard limit: **1000 characters for the whole description**, **1250 on a `Bug`**, because a bug also has to carry its verification, and **1500 on an `Epic`** under the condition in its section below. Count it before posting:
 
 ```bash
 wc -c < /tmp/desc.txt
@@ -45,9 +45,36 @@ Each AC should be checkable by someone who did not do the work.
 
 ### Never in a description
 
-No progress log. No "Outcome" or "Non-obvious mechanics" section. No before/after tables. No verification receipts or CI status. No out-of-scope section. No implementation notes naming the endpoint you used. No headings beyond the AC list. No evidence for a claim, and no paragraph justifying a tradeoff.
+No progress log. No "Outcome" or "Non-obvious mechanics" section. No before/after tables. No verification receipts or CI status. No out-of-scope section, apart from an `Epic`'s single `Not in this epic:` line. No implementation notes naming the endpoint you used. No headings beyond the AC list. No evidence for a claim, and no paragraph justifying a tradeoff.
 
 If something you discover mid-task changes the approach, **the AC line changes and the discovery itself does not appear at all.**
+
+### Epics state the capability they unlock
+
+An `Epic` is read by the people who decide whether the work matters, not only by whoever builds it. It drops the persona line and says what becomes possible once it is done. Write it this way:
+
+```
+For <who>, who <need>, <epic name> is <solution> that <benefit>.
+
+Unlike today, where <the gap>, it <what changes>.
+
+**Acceptance criteria**
+
+* <capability someone can try>
+* <one measurable figure, when the epic naturally produces one>
+
+Not in this epic: <neighbouring work that could get pulled in>.
+
+Depends on: <team> for <what they need to provide>.
+```
+
+* The opener is SAFe's epic hypothesis statement written as prose, split into two sentences at the "Unlike". The unlike sentence stands in for the current-state paragraph, so do not add one.
+* Each AC is a capability someone can try. Add one measurable figure when the epic naturally produces one, such as a latency that becomes readable, and never invent a target or a deadline to fill the slot.
+* `**Acceptance criteria**` is the only heading. The opener already is the outcome, so do not label it.
+* `Not in this epic:` appears only when neighbouring work could plausibly get pulled in. `Depends on:` appears only when another team owns part of the outcome. Both are optional single lines.
+* Aim for 1000 characters. Go past it, up to 1500, only when one of those two lines needs the room. The opener and ACs alone always fit in 1000.
+* Never list or link the child tickets; Jira shows them and a list goes stale on the first re-parent. No leading indicators either.
+* An epic closes when its outcome is met. Children still open at that point get re-parented or closed rather than holding it open.
 
 ### Bugs describe the failure, and there the evidence belongs
 
@@ -94,6 +121,7 @@ Three surfaces, three budgets, same instinct: the artifact is not your notebook.
 | surface | budget | carries |
 |---|---|---|
 | description (before work) | 1000 chars, 1250 on a `Bug` | problem + ACs as future state |
+| epic description | 1000 chars, 1500 with a scope or dependency line | capability unlocked + ACs |
 | comment (after work) | compact | outcome + the calls a reader would not expect |
 | first comment on a bug (before work) | 1000 chars | a proposed fix, offered as an option |
 | PR description | 1007 chars | what changed + the one fact not visible in the diff |
@@ -140,13 +168,14 @@ Branch naming, push and PR rules live in CLAUDE.md and are not this skill's job.
 
 ## Checklist before posting
 
-- [ ] `wc -c` under 1000 on the description, 1250 if it is a `Bug`, and under 1000 on any comment carrying a proposed fix
+- [ ] `wc -c` under 1000 on the description, 1250 if it is a `Bug`, 1500 on an `Epic` only when a `Not in this epic:` or `Depends on:` line needs it, and under 1000 on any comment carrying a proposed fix
 - [ ] Every code identifier is in backticks
 - [ ] Every AC reads as a future state a reviewer can check, or, on a bug, the description gives the failure mode and how it was verified and carries no ACs
 - [ ] On a bug, the verification sits under a `**Verified**` label as When, Where and How bullets, with the measurement in prose below them
 - [ ] A proposed fix reads as an option rather than an instruction, and opens with `Potential fix: `
 - [ ] No line addressed to the user, and no `land`, `lands` or `nobody`
-- [ ] No progress log, no tables, no CI status, no out-of-scope section, and on a Story or Task no evidence either
+- [ ] No progress log, no tables, no CI status, no out-of-scope section (an `Epic` gets one `Not in this epic:` line at most), and on a Story or Task no evidence either
+- [ ] An `Epic` opens with the For/who/Unlike statement, not a persona line, and lists no child tickets
 - [ ] Anything cut has a home in the memory store or a research file
 - [ ] Correct site and project, and issue type verified against project metadata
 
