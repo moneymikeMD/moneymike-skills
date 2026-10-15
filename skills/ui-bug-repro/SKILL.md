@@ -1,6 +1,6 @@
 ---
 name: ui-bug-repro
-description: "Reproduce a UI, layout, gesture, viewport, keyboard, WebKit or WebView-storage bug in a real environment before reasoning from source: local Chrome, the user's physical iPhone over Appium (Safari or the native app itself), the iOS Simulator, or the Android phone via the android-device-test skill. Use for any visual or interaction bug report, any iOS-only or Safari-only complaint, pinch zoom, blank screen, soft keyboard, scroll or iframe embed issue, any 'progress is lost when I close the app' report, to A/B a CSS fix on device, and whenever a bug is being attributed to a specific app build or PR."
+description: "Reproduce a UI, layout, gesture, viewport, keyboard, WebKit or WebView-storage bug in a real environment before reasoning from source: local Chrome, the user's physical iPhone over Appium (Safari or the native app itself), the iOS Simulator, or the Android phone via the android-device-test skill. Use for any visual or interaction bug report, any iOS-only or Safari-only complaint, pinch zoom, blank screen, soft keyboard, scroll or iframe embed issue, any 'progress is lost when I close the app' report, to A/B a CSS fix on device, to verify a web build's telemetry or bridge behaviour inside an app WebView, and whenever a bug is being attributed to a specific app build or PR."
 license: MIT
 ---
 
@@ -21,6 +21,10 @@ Recall from the memory store before anything else (how: `memory.md`): query `<co
 ## Preflight: pass these gates before reproducing anything
 
 Every wrong conclusion in that storage investigation came from skipping one of these, and each is one command. Run them first, not after a repro you are trying to explain.
+
+**0. Check what is already running before starting anything.** Probe each piece once: the dev server (curl both `127.0.0.1:<port>` and `[::1]:<port>`, since a server bound to one address leaves a proxy dialling the other at 502), the JS bundler's status endpoint, `xcrun simctl list devices booted`, and the automation server's `/status`. Start only what is missing. A second server started blind once shadowed the user's own on the other address and cost a debugging detour.
+
+**0b. Does the installed app binary match the JS the bundler serves?** A debug build loads JS from the bundler's checkout, so a native dependency added after the binary was built red-boxes the bundle (`Unable to resolve module ...`). Compare the installed app's version and build date with the checkout before driving it. The fix is a dependency install, a native pod install and a rebuild; that touches the user's checkout, so ask first.
 
 **1. Is the suspect code even in the build?** A repro on a build that lacks the commit cannot be caused by it. Settle this before testing anything, with the build-provenance script the context file names if there is one. Containment drifts as branches merge, so check when the bug is reported. An entire simulator phase once tested a PR that was never in the beta.
 
@@ -115,6 +119,19 @@ Type into a WebView text field with one `setValue` call rather than tapping keys
 - Keystrokes via System Events work once a WebView input is focused by a click. Never send a string containing `d` to a React Native debug build: it opens the Dev Menu. Dismiss with key code 53; key code 36 is Return.
 - `simctl openurl` triggers an "Open in <app>?" confirm. Return accepts it.
 - `screencapture -R <rect>` fails without Screen Recording permission; `screencapture -x -D 1` and `xcrun simctl io booted screenshot` both work.
+- **A hung `lsof` stalls Appium silently.** Session creation runs `lsof -ti tcp:8100` and WebView context discovery runs `lsof -aUc launchd_sim`; when `lsof` hangs system-wide the session sits at "Setting up simulator" and `contexts` never returns. Probe it with a background `lsof -nP -p $$` killed after a few seconds. Killing the hung `lsof` lets session creation continue, but context discovery still needs it, so switch to a path that needs no WebView inspection (next section). macOS has no `timeout` binary.
+- In zsh, `$var` holding `"x y"` is not word-split, so a loop over coordinate pairs passes one argument. Pass coordinates as separate arguments.
+
+## Verify a web build inside an app WebView without inspecting it
+
+When the question is "does this web change behave inside the app" (telemetry, a bridge, a postMessage), you do not need the WebView debugger.
+
+- If the app has a debug override for its WebView base URL, point it at a local host the app's allowlists accept and serve a **stub parent page** at the route the app opens. The stub iframes the local build and passes `location.search` through. Write the override into the app's persisted storage while the app is terminated, then relaunch.
+- Serve a **production build**, not the dev server, when the question involves lazy loading or build-time values; a dev server can fetch lazy chunks eagerly and carries no real version.
+- The stub does not send the host page's handshake messages, so the app may treat the page as never-ready and reload it once. Expect a duplicate view and say so rather than reading it as a bug.
+- Read the result from the server's access log (which chunks were fetched) and from the telemetry backend, not from a screenshot.
+- Content inside a nested cross-origin iframe (a third-party widget) is invisible to the outer page's instrumentation: its taps produce no action events. State that limit rather than reporting missing data as a failure.
+- Prepare the session, tap coordinates and inputs before opening the target screen. The first real interaction should land within a minute of the screen appearing; if it does not, the method needs optimising, not more retries.
 
 ## Naming a cause
 
