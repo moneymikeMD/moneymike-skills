@@ -25,6 +25,11 @@ The user is the one who talks to the author. This skill produces text they read 
 2. **Read the ticket and its sub-tickets.** The PR body links a ticket; fetch it and then every sub-task under it. The VQA sub-task is where the design team leaves the notes that say whether the implementation actually matches what they asked for, and those notes are usually newer than the PR. Compare each note to the diff line by line, and compare its timestamp to the last commit date: a note posted after the last commit is an outstanding change the PR has not answered yet.
 3. Invoke `/code-review <pr-number-or-url> high`. Never add `--comment` or `--fix`.
 4. Re-sort the output with the `review-pr-scoped` skill's three buckets: blocking, non-blocking in scope, non-blocking expands scope. That skill owns the ranking; do not restate its reasoning here.
+5. **Prove each fix you suggest before suggesting it.** Do this for the blocking findings only, at most the top three by that ranking. Everything else goes out as found.
+   - Apply the suggested fix in a scratch worktree of the PR branch, run the app, and repeat the exact repro that showed the bug.
+   - Then follow the path the fix changes or skips and check what it actually sends or does now, not just that the original error is gone. A fix that skips a guard skips everything the guard did. Split the guard's jobs and keep the ones the skipped path still needs.
+   - Keep a fix sentence only if it passed both checks. If it failed, revise it until one passes, or state the bug without prescribing a fix.
+   - Remove the worktree and stop anything it started.
 
 ## Compare the VQA timestamp to the last commit before writing anything
 
