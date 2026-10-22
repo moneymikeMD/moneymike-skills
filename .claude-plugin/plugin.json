@@ -1,6 +1,6 @@
 {
   "name": "moneymike-skills",
-  "description": "Personal workflow skills: PR shipping and review, Jira authoring, research files, UI bug repro on real devices, Datadog monitor and catalog hygiene, GitHub repo hardening, review writing, session retros, writing for agents and compacting idle Herdr sessions.",
-  "version": "0.5.0",
+  "description": "Personal workflow skills: ticket start and closeout, PR shipping, preflight, review rounds and local testing, CI fixes, multi-repo waves, Dependabot sweeps, QA hand-offs, Jira authoring, voice drafts, end-of-day reports, project pages, session harvests, research files, UI bug repro on real devices, Datadog hygiene, GitHub repo hardening, retros, writing for agents and compacting idle Herdr sessions.",
+  "version": "0.6.0",
   "author": { "name": "Mike Garrett" }
 }
