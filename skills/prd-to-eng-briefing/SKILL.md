@@ -166,9 +166,9 @@ Both go in the research directory. Slug them off the project, not the PRD title:
 ### `<slug>-research.md`
 
 The evidence store, and the only place drafts live. Follows the `research-file-update`
-contract: dated sections, each with its own `*Verified <date>.*`, append a dated refinement
-under a finding rather than overwriting it, record contradictions instead of picking a
-winner, bump `Last verified` in the header.
+contract for evidence files: dated sections, each with its own `*Verified <date>.*`, a
+disproved claim cut to a pointer at what superseded it, and `Last verified` bumped in the
+header.
 
 Structure:
 
