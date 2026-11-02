@@ -184,7 +184,7 @@ A ticket is a manager handing a scoped item to their team, so the register is pe
 Mechanisms, gotchas, corrected assumptions, evidence and per-item results belong in:
 
 - the memory store (see `memory.md`)
-- the research files, one per product. Append a dated section, never overwrite an existing finding (see `research-file-update`).
+- the research files, one per product, kept current through `research-file-update`.
 
 When the detail is already in both places, writing it into the ticket too is pure duplication.
 
