@@ -38,7 +38,8 @@ Every wrong conclusion in that storage investigation came from skipping one of t
 
 | Bug type | Environment |
 |---|---|
-| Layout, DOM, console, network, desktop-only | Local Chrome via `claude-in-chrome` at the local dev host |
+| Layout, DOM, click-through, desktop-only, a GIF for the PR | Local Chrome via `claude-in-chrome` at the local dev host |
+| Console stacks, network headers and bodies, performance traces, Lighthouse, throttled or emulated devices, any page behind bot protection | A DevTools MCP attached to a Chrome the user launched by hand, if the context file names one. A Chrome an MCP launches itself carries `--enable-automation`, so `navigator.webdriver` is true and bot protection can block it. If it fails to connect, stop and say so rather than launching a browser. |
 | Touch, gesture, pinch, visual viewport, memory pressure, WebKit | Physical iPhone via Appium (below) |
 | WebView storage persistence across app kill (localStorage, saved progress, "lost when I close the app") | Physical iPhone against the **app bundle id**, not Safari. The simulator does not reproduce these. |
 | Anything you suspect a specific app build or PR caused | Physical iPhone, and **verify the build's provenance first** |
