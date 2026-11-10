@@ -30,6 +30,7 @@ The user is the one who talks to the author. This skill produces text they read 
    - Then follow the path the fix changes or skips and check what it actually sends or does now, not just that the original error is gone. A fix that skips a guard skips everything the guard did. Split the guard's jobs and keep the ones the skipped path still needs.
    - Keep a fix sentence only if it passed both checks. If it failed, revise it until one passes, or state the bug without prescribing a fix.
    - Remove the worktree and stop anything it started.
+6. **Check every `file:line` anchor against the PR head before writing the reply.** This applies to every finding you will present, not only the blocking ones. `/code-review` line numbers drift by a line or two and can land on a neighbouring line such as a closing bracket or the selector above a declaration. Print each one with `git show <head-sha>:<path> | sed -n '<line>p'` and change the number to the line that holds the code the finding names. The user pastes these anchors as inline comments, so a wrong one either lands on the wrong line or has to be corrected after they have already read it.
 
 ## Compare the VQA timestamp to the last commit before writing anything
 
