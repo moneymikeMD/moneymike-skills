@@ -215,7 +215,7 @@ Branch naming, push and PR rules live in CLAUDE.md and are not this skill's job.
 
 ## Transitions and connection gotchas
 
-Look up transition ids with `getTransitionsForJiraIssue` rather than guessing, unless the context file lists them.
+Look up transition ids with `listJiraIssueTransitions` rather than guessing, unless the context file lists them.
 
 The Atlassian MCP can return an AWS WAF human-verification HTML page instead of JSON. That is not a permissions problem and not evidence the ticket is missing; retry once, then tell the user the site is challenging the connector.
 
