@@ -1,19 +1,6 @@
 ---
 name: review-writer
-description: >-
-  Use this skill to turn the user's own firsthand experience into a review they can paste
-  and post. Trigger whenever someone describes a place they went, a business or pro they
-  used, or something they bought, watched, or read, and asks you to write it up, draft it,
-  put it into words, leave feedback, post their thoughts, or rate it. Covers restaurants,
-  cafes, hotels, doctors, dentists, plumbers, contractors, apps, gadgets, movies, books,
-  and events, for Google, Yelp, TripAdvisor, Letterboxd, App Store, Amazon, or social.
-  They usually mix good and bad ("food great, parking awful") and may never say the word
-  "review"; treat any "write up how it went / help me post this / leave them feedback"
-  about a firsthand experience as a match. Handles the full workflow: gather the facts,
-  ask any missing clarifying questions, draft, then run the humanizer skill so it doesn't
-  read as AI-written. Not for: reading, finding, or summarizing other people's reviews;
-  researching what to buy; writing a LinkedIn recommendation; reviewing code, PRs, or
-  resumes; or booking a reservation.
+description: "Turns the user's own firsthand experience into a review they can paste and post. Trigger whenever someone describes a place they went, a business or pro they used, or something they bought, watched, or read, and asks you to write it up, draft it, put it into words, leave feedback, post their thoughts, or rate it. Covers restaurants, cafes, hotels, doctors, dentists, plumbers, contractors, apps, gadgets, movies, books, and events, for Google, Yelp, TripAdvisor, Letterboxd, App Store, Amazon, or social. They usually mix good and bad ('food great, parking awful') and may never say the word 'review'; treat any 'write up how it went / help me post this / leave them feedback' about a firsthand experience as a match. Gathers the facts, asks what is missing, drafts, then runs the humanizer skill so it doesn't read as AI-written. Not for: reading, finding, or summarizing other people's reviews; researching what to buy; writing a LinkedIn recommendation; reviewing code, PRs, or resumes; or booking a reservation."
 license: MIT
 ---
 
