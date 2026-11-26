@@ -79,71 +79,11 @@ invisible to code search. Look for it deliberately.
 
 ## Phase 3: analyse the affected codebases
 
-Read the workspace architecture map and the repo's best-practices file first, if the
-context file names them. Use tokensave for all code exploration: `tokensave_status` to check index freshness,
-then `tokensave_context`, `tokensave_search`, `tokensave_callers`. Never an Explore agent.
-Query sibling repos with `graph_root` rather than adding directories.
-
-Take notes on these specifically. Each one either blocks a PRD step or shrinks it:
-
-- **The chokepoint.** The single base class, middleware or dispatch function every code
-  path passes through. Cross-cutting changes belong there and nowhere else.
-- **Inheritance blast radius.** Count the descendants of any class the PRD implies changing.
-  A flag on a shared base propagates into every subclass. This is the most common way a
-  one-route change becomes a fifty-route change.
-- **Existing precedent.** Search for a partial implementation of what the PRD asks for. It
-  is often weeks old with a single consumer, complete with tests you can copy. Check
-  `git log` on the relevant files; the precedent may post-date your mental model of the
-  repo.
-- **Load-bearing lines that look like hygiene.** A cache header on an authenticated
-  response, a constant-time compare, a `Vary`. Note them as required for correctness so
-  nobody reimplements the gate without them.
-- **Validation that is weaker than it looks.** A config field validated for shape but not
-  for target, then executed.
-- **Anything undocumented, surprising, or contradicted by the repo's own docs.**
+Read `references/codebase-and-measurement.md` now; it carries Phases 3 and 4 in full. Explore with tokensave, never an Explore agent, and note the chokepoint, the inheritance blast radius and any existing precedent.
 
 ## Phase 4: quantify before concluding
 
-Never accept a scale claim, from the PRD or from yourself, without measuring it. A PRD that
-says "at scale" has no number behind it.
-
-- **CDN access logs**, if they are exported to a warehouse, answer who consumes what, how
-  much, and with what status. Dry-run the query first and report the bytes; constrain any
-  date-sharded table to the range you need.
-- **Check what your APM actually receives** before computing a rate from it. If the CDN
-  answers cache hits without reaching the origin, APM sees only misses.
-- **Application database** for configuration rows. There is usually no local copy and no
-  network path from the laptop; run a management command in the environment instead. Check
-  the repo's best-practices file for the exact invocation.
-- **Live HTTP** for response headers, body size and entry counts. A 200 from a feed or API
-  does not mean it returned content; count the elements.
-
-Measure four things every time:
-
-1. **The subject of the PRD.** Requests, bytes, distinct clients.
-2. **Its neighbours.** Without them you cannot say what share the subject is, and share is
-   what makes the case.
-3. **Status codes, not just volume.** Errors and redirects hide inside a request count, and
-   a 401 count tells you whether an existing gate works.
-4. **Zero-traffic configuration.** Rows that exist and are never used. This regularly cuts
-   the migration list in half and turns research tickets into delete tickets.
-
-Attribute every number to its table, field or code path in the same sentence. If something
-is inferred rather than measured, say so in the same sentence.
-
-### Probe from outside and read the configuration. Both.
-
-Someone else's prior audit of the same system was probably done by probing the live
-endpoints. It will catalogue headers, status codes and discoverability, and it will miss any
-subsystem that lives at a different URL. Your code-and-config survey will miss everything
-the audit found. Neither is complete. Run both, and expect the other document's open
-questions to be answered by your findings.
-
-When incorporating someone else's research, **adjudicate it rather than appending it.** One
-row per claim, with a verdict and your evidence: right, right but wider than stated, half
-right with the conclusion wrong, stale, or answered. Their wrong conclusions are worth as
-much as their right ones, because someone on the team will otherwise act on them. Say
-explicitly what not to build.
+Never accept a scale claim, from the PRD or from yourself, without measuring it, and attribute every number to its source in the same sentence. Adjudicate someone else's prior research claim by claim rather than appending it. Method and sources: `references/codebase-and-measurement.md`.
 
 ## Phase 5: put the decisions to the user
 
@@ -163,131 +103,9 @@ refinement session, not for filing work.
 Both go in the research directory. Slug them off the project, not the PRD title:
 `<slug>-research.md` and `<slug>-engineering-brief.md`.
 
-### `<slug>-research.md`
-
-The evidence store, and the only place drafts live. Follows the `research-file-update`
-contract for evidence files: dated sections, each with its own `*Verified <date>.*`, a
-disproved claim cut to a pointer at what superseded it, and `Last verified` bumped in the
-header.
-
-Structure:
-
-1. Header: what it covers, `Last verified`, and a linked list of source documents including
-   the PRD, trackers, prior audits and prior tickets.
-2. The PRD premise, corrected.
-3. Inventory and measurements, one dated section each.
-4. Adjudication of any prior research.
-5. Settled decisions, each with the rejected alternative and the reason.
-6. PRD wording that should change.
-7. Draft ticket bodies.
-8. Open questions, including the PRD's own unanswered FAQ.
-
-Ticket bodies follow the `jira-author` contract: under 1000 characters, acceptance criteria
-as ideal future states a reviewer can check. Order them by dependency and say which blocks
-which. Give each a type and an owner where the owner is not engineering. Mark the one that
-must happen first.
-
-**A finding that belongs to another team gets its own ticket in their project**, scoped to
-their fix alone so they do not inherit the roadmap. Note the key in the research file.
-
-### `<slug>-engineering-brief.md`
-
-The shareable artifact. Two audiences read one document: engineers who need a starting point
-before opening the code, and product managers who need to understand how the system is
-actually built. It also becomes starting context for their own LLM sessions, so it must be
-dense and literal. Do not split it into engineering and business sections.
-
-Content:
-
-- Keep the technical specifics. Code paths, table and field names, query sources, thresholds
-  and measured numbers are the point, not noise to summarise away. A reader goes from this
-  document straight to the file or the query.
-- Attribute every number to its source so a reader can re-derive it. Open with a data
-  sources table.
-- State findings as facts with their evidence. Inference is labelled in the same sentence.
-- Preserve anything surprising, undocumented or invisible in the repository. Highest value
-  content in the document.
-- Drop methodology narrative, dead ends, session history, and anything reading as a status
-  update. Drop the ticket list and the project decisions; those live in the research file.
-  Keep access and query instructions, because without them nothing is re-derivable.
-
-Style:
-
-- Terse. No pleasantries, no framing sentences, no "it is worth noting", no closing summary,
-  no offers of further work.
-- No idioms, no metaphors, no filler, no hype adjectives.
-- **No em dashes or en dashes.**
-- Short declarative sentences. Tables and lists wherever the content is structured data.
-- Define an acronym or internal term once, on first use.
-- Headings name the thing described, not the section's purpose. "Feed routing", not
-  "Background and Context".
-- As short as the content allows. Delete any heading with nothing under it.
-- **Do not hard-wrap.** One line per paragraph, so it survives being pasted elsewhere.
-  Headings, table rows, list items and fenced code keep their own lines.
-
-Make every reference clickable:
-
-| reference | target |
-|---|---|
-| code path with a line number | `https://github.com/<owner>/<repo>/blob/<default-branch>/<path>#L<n>` |
-| commit, pull request | `/commit/<sha>`, `/pull/<n>` |
-| ticket key | `https://<jira-site>/browse/<KEY>` |
-| Confluence page | resolve the real URL from the search result, do not guess |
-| Django admin page | the live admin URL, checking where the urlconf mounts admin |
-| Google Doc or Sheet | the URL from the PRD, first mention only |
-| BigQuery table | the project's BigQuery console, first mention only |
-| Slack channel | `https://<workspace>.slack.com/archives/<CHANNEL_ID>` |
-| live endpoint | link it where clicking is the verification, such as a defects table. Not on every mention. |
-
-Confirm the repo and default branch from `git remote get-url origin` rather than assuming;
-they differ per repo. Do not link a file that the document cites because it does not exist.
-
-Before handing it over, verify:
-
-```bash
-grep -n '[—–]' <file>                      # must be empty
-grep -nE '\]\([^)]*\]\(|\[\[' <file>        # no nested links
-awk '{o=gsub(/\[/,"[");c=gsub(/\]/,"]"); if(o!=c) print NR}' <file>   # balanced
-sed -n '<n>p' <repo>/<path>                 # every linked line still says what you cite
-```
-
-Line-anchored links to a moving branch drift. Verify each one at write time, state in the
-data sources table which ref they point at, and offer to pin to a commit SHA for a document
-expected to outlive the branch.
-
-### Publishing to Confluence
-
-Pasting markdown into the Confluence editor silently strips every link. Publish through the
-API instead, and note which Atlassian site the space is on. The wiki and the tickets you
-link can sit on **different sites and connectors**.
-
-**Use `contentFormat: "html"`, never `"markdown"`.** ADF cannot carry a `code` mark and a
-`link` mark on the same text node, and the two converters resolve that conflict in opposite
-directions:
-
-| format | `[`path`](url)` becomes |
-|---|---|
-| `markdown` | monospace text, **href discarded** |
-| `html` | a working link, monospace discarded |
-
-Links are worth more than monospace in a document whose purpose is navigation. Markdown also
-autolinks bare hostnames into junk (`Amazon.com` becomes `http://Amazon.com`) and drops bold
-that wraps a code span; HTML does neither.
-
-Call `getContentFormatGuide` with the tool name before authoring HTML. Convert the markdown
-mechanically rather than by hand: headings to `<h2>`–`<h6>`, paragraphs to `<p>`, tables to
-`<table><thead><tr><th><p>…`, cells wrapping block content in `<p>`, fenced code to
-`<pre><code class="language-x">`, and inline links to `<a href="URL"><code>label</code></a>`.
-Escape `&`, `<` and `>` before adding tags. Emit a body fragment with no `<html>` wrapper.
-
-Drop the H1; the page title already carries it.
-
-**Verify by reading the page back and counting anchors.** Do not report success from the
-update response, which returns only a version number. Fetch the page and confirm the link
-count matches what you sent.
-
-Known cosmetic artifact: bold that wraps a code span renders with the emphasis split at the
-boundary. Harmless, but rewrite those sentences if the page needs to look polished.
+- Before writing `<slug>-research.md`, read `references/research-file.md`.
+- Before writing `<slug>-engineering-brief.md`, read `references/engineering-brief.md`. The brief opens with a data sources table straight under the title, with nothing before it; the file has the style rules, the link table and the checks to run before handing it over.
+- Before publishing the brief to Confluence, read `references/confluence-publishing.md`. Publish through the API with `contentFormat: "html"`, never `"markdown"`, and verify by reading the page back.
 
 ## Close the loop
 
